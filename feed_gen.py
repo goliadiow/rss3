@@ -7,10 +7,22 @@ from xml.sax.saxutils import escape
 USER_AGENT = "ErichRiesenberg itserich@gmail.com"
 # Define your phrases here
 # Define your phrases here as a list
-PHRASES = ["tender offer"]
-
-# This builds the exact string required by the SEC API:
-# '"tender offer" OR "liquidating distribution" OR "plan of arrangement"'
+PHRASES = [
+    "tender offer",
+    "plan of arrangement",
+    "intent acquire",
+    "definitive merger agreement",
+    "consider strategic alternatives",
+    "liquidating distribution",
+    "plan return capital",
+    "restructure return capital",
+    "reduction force",
+    "review business",
+    "exploring strategic alternatives",
+    "strategic review",
+    "wind down",
+    "voluntary petition 11"
+]
 QUERY = " OR ".join(f'"{p}"' for p in PHRASES)
 FORMS = ["8-K","6-K","DEF 14A","PRE 14A","DFAN14A","DEFM14A","PREM14A","PREC14A","DEFC14A","PREC14C","DEFC14C","SC TO-C","SC TO-T","SC TO-I"]
 LOOKBACK_DAYS = 4
