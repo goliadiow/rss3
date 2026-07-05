@@ -32,34 +32,33 @@ MAX_INSTANCES = 10
 OUTPUT_FILE = "docs/feed.xml"
 CACHE_FILE = "docs/cache.json"
 
+import logging
+import time
+from urllib.error import HTTPError, URLError
+
+# Configure logging
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+
 def fetch_hits():
-    end = datetime.utcnow().date()
-    start = end - timedelta(days=LOOKBACK_DAYS)
-    params = {
-        "q": QUERY, 
-        "forms": ",".join(FORMS), 
-        "dateRange": "custom", 
-        "startdt": start.isoformat(), 
-        "enddt": end.isoformat(), 
-        "size": 100 
-    }
-    url = "https://efts.sec.gov/LATEST/search-index?" + urlencode(params)
+    # ... (rest of your setup code)
+    max_retries = 3
+    for attempt in range(max_retries):
+        try:
+            with urlopen(req, timeout=10) as resp:
+                return json.loads(resp.read().decode())
+        except HTTPError as e:
+            if e.code == 429:
+                sleep_time = (attempt + 1) * 10
+                logging.warning(f"Rate limited. Retrying in {sleep_time}s...")
+                time.sleep(sleep_time)
+            else:
+                logging.error(f"HTTP Error: {e.code} - {e.reason}")
+                break
+        except URLError as e:
+            logging.error(f"Network error: {e.reason}")
+            time.sleep(5)
+    return []
     
-    # Log the URL so you can copy-paste it into a browser to test
-    print(f"DEBUG: Querying SEC API: {url}")
-    
-    req = Request(url, headers={"User-Agent": USER_AGENT})
-    try:
-        with urlopen(req, timeout=10) as resp:
-            data = json.loads(resp.read().decode())
-            hits = data.get("hits", {}).get("hits", [])
-            # Log the number of hits returned
-            print(f"DEBUG: API returned {len(hits)} hits.")
-            return hits
-    except Exception as e:
-        print(f"Request failed: {e}")
-        return []
-        
 def fetch_all_snippets(url, phrases, words=CONTEXT_WORDS, max_instances=MAX_INSTANCES):
     try:
         req = Request(url, headers={"User-Agent": USER_AGENT})
