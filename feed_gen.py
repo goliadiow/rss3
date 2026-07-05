@@ -34,17 +34,24 @@ CACHE_FILE = "docs/cache.json"
 
 import logging
 import time
+import urllib.request
 from urllib.error import HTTPError, URLError
 
 # Configure logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
 def fetch_hits():
-    # ... (rest of your setup code)
+    # Construct the URL for the SEC EDGAR search
+    # Ensure 'QUERY' is defined globally in your script
+    url = f"https://data.sec.gov/submissions/something_here?q={QUERY}" 
+    
     max_retries = 3
     for attempt in range(max_retries):
         try:
-            with urlopen(req, timeout=10) as resp:
+            # FIX: Define the request object before calling urlopen
+            req = urllib.request.Request(url, headers={"User-Agent": USER_AGENT})
+            
+            with urllib.request.urlopen(req, timeout=10) as resp:
                 return json.loads(resp.read().decode())
         except HTTPError as e:
             if e.code == 429:
